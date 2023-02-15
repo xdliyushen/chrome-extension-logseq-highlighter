@@ -1,43 +1,58 @@
 'use strict';
 
-// Content script file will run in the context of web page.
-// With content script you can manipulate the web pages using
-// Document Object Model (DOM).
-// You can also pass information to the parent extension.
+import { v4 as uuid } from 'uuid';
+import API from './api';
+import { EVENT } from './constant';
 
-// We execute this script by making an entry in manifest.json file
-// under `content_scripts` property
+// todo d
+console.log(chrome);
 
-// For more information on Content Scripts,
-// See https://developer.chrome.com/extensions/content_scripts
+function initCursorPopups() {
 
-// Log `title` of current active web page
-const pageTitle = document.head.getElementsByTagName('title')[0].innerHTML;
-console.log(
-  `Page title is: '${pageTitle}' - evaluated by Chrome extension's 'contentScript.js' file`
-);
+}
 
-// Communicate with background file by sending a message
-chrome.runtime.sendMessage(
-  {
-    type: 'GREETINGS',
-    payload: {
-      message: 'Hello, my name is Con. I am from ContentScript.',
-    },
-  },
-  response => {
-    console.log(response.message);
-  }
-);
+// TODO 读取内存 添加高亮
+function loadHighlighs() {
 
-// Listen for message
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === 'COUNT') {
-    console.log(`Current count is ${request.payload.count}`);
-  }
+}
 
-  // Send an empty response
-  // See https://github.com/mozilla/webextension-polyfill/issues/130#issuecomment-531531890
-  sendResponse({});
-  return true;
-});
+function normalizeSelection(selection) {
+    // todo d
+    console.log('selection object', selection);
+
+    return Object.assign({
+        id: uuid(),
+        text: selection.toString(),
+    }, selection);
+}
+
+function executeCapture() {
+    const selection = window.getSelection();
+
+    if(selection.type === 'Range') {
+        const normalizedSelection = normalizeSelection(selection);
+        API.addHightlight(normalizedSelection);
+    }
+}
+
+function initMessageListeners() {
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        switch (request.type) {
+            case EVENT.CAPTURE:
+                executeCapture();
+        }
+
+        // Send an empty response
+        // See https://github.com/mozilla/webextension-polyfill/issues/130#issuecomment-531531890
+        sendResponse({});
+    });
+}
+
+// TODO storage inspector chrome-extension://ID/manifest.json
+const initalize = () => {
+    initCursorPopups();
+    loadHighlighs();
+    initMessageListeners();
+};
+
+initalize();
