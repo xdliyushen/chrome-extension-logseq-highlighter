@@ -18,7 +18,7 @@
     "default_popup": "popup.html"
   },
   "commands": {
-    "execute-capture": {
+    "highlight-text": {
       "suggested_key": {
         "default": "Ctrl+H",
         "mac": "MacCtrl+H"
