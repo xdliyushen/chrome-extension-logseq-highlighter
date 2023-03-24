@@ -17,6 +17,7 @@
     "default_title": "Logseq Web Capture",
     "default_popup": "popup.html"
   },
+  "options_page": "options.html",
   "commands": {
     "highlight-text": {
       "suggested_key": {
@@ -29,7 +30,8 @@
   "permissions": [
     "contextMenus",
     "scripting",
-    "storage"
+    "storage",
+    "tabs"
   ],
   "content_scripts": [
     {

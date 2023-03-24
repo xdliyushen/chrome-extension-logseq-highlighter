@@ -1,16 +1,20 @@
-import { COMMANDS } from '../constant';
-import API from '../api';
+import { COMMANDS } from '../utils/constant';
+import API from '../utils/api';
+import storageManager from '../utils/storeManager';
+import { initPopup } from './hoverTools';
 
 // todo d
 console.log(chrome);
 
-function initCursorPopups() {
+async function loadHighlighs() {
+    const highlights = (await storageManager.readAll()) || [];
 
-}
+    // todo d
+    console.log('highlights', highlights);
 
-// TODO 读取内存 添加高亮
-function loadHighlighs() {
-
+    for (const highlightInfo of highlights) {
+        await API.addHighlight(highlightInfo);
+    }
 }
 
 function initMessageListeners() {
@@ -20,7 +24,7 @@ function initMessageListeners() {
 
         switch (request.type) {
             case COMMANDS.HIGHTLIGHT_TEXT:
-                await API.highlightText()
+                API.highlightCurrentText();
         }
 
         // Send an empty response
@@ -30,9 +34,9 @@ function initMessageListeners() {
 }
 
 // TODO storage inspector chrome-extension://ID/manifest.json
-const initalize = () => {
-    initCursorPopups();
-    loadHighlighs();
+const initalize = async () => {
+    await loadHighlighs();
+    initPopup();
     initMessageListeners();
 };
 

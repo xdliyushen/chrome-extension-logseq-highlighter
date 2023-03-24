@@ -1,8 +1,9 @@
-import storeManager from './utils/store';
+import storeManager from './storeManager';
 import { DEFAULT_BG_COLOR, DEFAULT_TEXT_COLOR } from './constant';
-import { initHoverEvents } from './contentScripts/hoverTools';
-import { isVisiable, querySelector } from './utils';
+import { initializeHighlightEventListeners, removeHighlightEventListeners } from '../contentScripts/hoverTools';
+import { isVisiable, querySelector } from '.';
 
+// TODO 如果页面换行的时候会有问题
 const _recursiveWrapper = (container, selectionInfo, startFound, highlightedLen) => {
     const { anchorNode: anchorNodeSelector, anchorOffset, focusNode: focusNodeSelector, focusOffset, text, highlightId, bgColor, textColor } = selectionInfo;
     const anchorNode = querySelector(anchorNodeSelector);
@@ -53,7 +54,7 @@ const _recursiveWrapper = (container, selectionInfo, startFound, highlightedLen)
     return [startFound, highlightedLen];
 };
 
-async function highlightText() {
+async function highlightCurrentText() {
     const selection = window.getSelection();
     const text = selection.toString();
 
@@ -66,31 +67,43 @@ async function highlightText() {
     } = await chrome.storage.sync.get(['bgColor', 'textColor']);
 
     // save to storage
-    const selectionInfo = await storeManager.create(selection, location.hostname + location.pathname, bgColor, textColor);
+    const selectionInfo = await storeManager.create(selection, bgColor, textColor);
 
     // step1: find selection start/end and insert span to wrap the selection
     // TODO rangeCount may be > 1
     let container = selection.getRangeAt(0).commonAncestorContainer;
-    while (!container.innerHTML) container = container.parentElement;
-    _recursiveWrapper(container, selectionInfo, false, 0);
+    addHighlight(selectionInfo, container);
 
     // step3: deselect the selection
     if (selection.removeAllRanges) selection.removeAllRanges();
+}
 
-    // step4: add mouse hover event listener to the span
+function addHighlight(selectionInfo, _container) {
+    let container = _container || querySelector(selectionInfo.container);
+    if(!container) return;
+    while (!container.innerHTML) container = container.parentElement;
+    _recursiveWrapper(container, selectionInfo, false, 0);
+
+    // add mouse hover event listener to the span
     const highlightElementss = document.querySelectorAll(`.logseq-highlight[data-logseq-highlight-id="${selectionInfo.highlightId}"]`);
     highlightElementss.forEach(_ele => {
-        initHoverEvents(_ele);
+        initializeHighlightEventListeners(_ele);
     });
 }
 
-// TODO 修改
-function removeHighlight() {
-
+function removeHighlight(highlightId) {
+    const highlightElements = document.querySelectorAll(`.logseq-highlight[data-logseq-highlight-id="${highlightId}"]`);
+    highlightElements.forEach(async (ele) => {
+        ele.style.color = 'inherit';
+        removeHighlightEventListeners(ele);
+        await storeManager.delete(highlightId);
+    });
 }
 
 const API = {
-    highlightText, removeHighlight
+    highlightCurrentText, 
+    removeHighlight, 
+    addHighlight,
 }
 
 export default API;

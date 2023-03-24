@@ -1,14 +1,16 @@
-import { COMMANDS } from "../constant";
-import { queryActiveTabId } from "../utils";
+import { COMMANDS } from "../utils/constant";
+import { queryActiveTab } from "../utils";
 
 async function highlightTextHandler() {
-    const currentTabId = await queryActiveTabId();
+    const { id: currentTabId } = (await queryActiveTab()) || {};
 
     // todo d
     console.log('currentTabId', currentTabId);
 
     if (currentTabId) {
-        chrome.tabs.sendMessage(currentTabId, { type: COMMANDS.HIGHTLIGHT_TEXT });
+        const res = await chrome.tabs.sendMessage(currentTabId, { type: COMMANDS.HIGHTLIGHT_TEXT });
+        // todo d
+        console.log('res', res);
     }
 }
 

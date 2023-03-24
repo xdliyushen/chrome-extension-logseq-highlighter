@@ -1,32 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <title>My Chrome Extension</title>
-    <link rel="stylesheet" href="popup.css" />
+  <meta charset="UTF-8">
+  <title>logseq web capture</title>
+  <link rel="stylesheet" href="popup.css" />
 </head>
+
 <body>
-  <div class="app">
-    <p class="counter-label">Counter</p>
-    <div id="counter" class="counter"></div>
-    <div class="button-container">
-      <button id="decrementBtn" class="button">-</button>
-      <button id="incrementBtn" class="button">+</button>
+  <div id="app" class="relative w-80 h-96 pb-6 text-base overflow-x-hidden overflow-y-scroll scrollbar-hide">
+    <div class="m-auto mt-1 w-11/12 target-page">
+      <label class="block flex-shrink-0 target-page-label">Target page:</label>
+      <input class="block flex-grow w-full mt-1 px-2 border border-gray-300 focus:outline-none focus:border-gray-500 rounded-sm target-page-input" />
     </div>
 
-    <hr class="divider" />
+    <div class="m-auto w-11/12 mt-2 content">
+      <label class="block content-label">Content:</label>
+      <textarea 
+        class="w-full h-60 mt-1 px-2 pt-1 border border-gray-300 focus:outline-none focus:border-gray-500 rounded-sm content-textarea"
+        placeholder="page content"></textarea>
+    </div>
 
-    <p class="title">Chrome Extension is Ready!</p>
-    <p class="subtitle">Start by updating <code>popup.html</code></p>
+    <button 
+      class="absolute top-1 right-3 w-5 h-5 opacity-60 hover:opacity-100 options-button bg-contain"
+      style="background-image: url(./config.png);">
+    </button>
+
+    <button class="fixed bottom-0 w-full h-6 text-gray-50 bg-green-800 export-button">Export</button>
   </div>
 
   <script src="popup.js"></script>
-
-  <!--
-    This HTML file opens when you click on icon from the toolbar.
-
-    To begin the development, run `npm run watch`.
-    To create a production bundle, use `npm run build`.
-  -->
 </body>
+
 </html>

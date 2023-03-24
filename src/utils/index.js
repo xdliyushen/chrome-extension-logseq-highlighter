@@ -1,3 +1,5 @@
+import parseUrl from "parse-url";
+
 export const isVisiable = (node) => {
     // from jquery
     return !!(node.offsetWidth || node.offsetHeight || node.getClientRects().length);
@@ -16,7 +18,7 @@ export const getNodeSelector = (node) => {
             const filterFn = isTextNode 
                 ? node => node.nodeType === Node.TEXT_NODE 
                 : node => node.tagName === currNode.tagName;
-            const tagName = isTextNode ? 'textNode' : currNode.tagName;
+            const tagName = isTextNode ? 'textNode' : currNode.tagName.toLowerCase();
             const index = Array.from(currNode.parentElement.childNodes)
                 .filter(filterFn)
                 .indexOf(currNode) + 1;
@@ -40,13 +42,19 @@ export const querySelector = (selector) => {
     if (!textNodeSelector) return node;
 
     const index = parseInt(textNodeSelector.match(/nth-of-type\((\d+)\)/)[1]);
-    const textNode = Array.from(node.childNodes)
+    const textNode = Array.from(node?.childNodes || [])
         .filter(node => node.nodeType === Node.TEXT_NODE)[index - 1];
 
     return textNode;
 }
 
-export async function queryActiveTabId() {
-    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-    return tabs?.[0]?.id;
+export async function queryActiveTab() {
+    const tabs = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+    return tabs?.[0];
+}
+
+// todo 删除该方法 还是不要这么用了
+export const normalizeUrl = url => {
+    const { resource, pathname } = parseUrl(url);
+    return `${resource}${pathname}`
 }

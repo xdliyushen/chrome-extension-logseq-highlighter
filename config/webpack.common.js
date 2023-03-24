@@ -12,6 +12,7 @@ const PATHS = require('./paths');
 // in template's `config` folder
 const common = {
   output: {
+    publicPath: '',
     // the build folder to output bundles and assets in.
     path: PATHS.build,
     // the filename template for entry chunks
@@ -28,11 +29,11 @@ const common = {
       // Help webpack in understanding CSS files imported in .js files
       {
         test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader'],
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader'],
       },
       // Check for images imported in .js files and
       {
-        test: /\.(png|jpe?g|gif)$/i,
+        test: /\.(png|jpe?g|gif|svg)$/i,
         use: [
           {
             loader: 'file-loader',
